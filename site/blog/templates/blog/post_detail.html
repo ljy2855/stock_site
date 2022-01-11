@@ -1,0 +1,53 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+
+
+
+<div class="content container">
+    <div class= "content">
+        
+
+
+
+            <h1>{{ stock.name |linebreaksbr }}</h1>
+            <h3>
+                현재가 : {{ stock.price|linebreaksbr }}
+            </h3>
+
+            <div class ="date">
+                <plus>고가 : {{ stock.high_price|linebreaksbr }}<br></plus>
+                <minus>저가 : {{ stock.low_price|linebreaksbr }}<br></minus>
+                등락 :
+                {% if stock.up_down < 0 %}
+                    <minus> {{stock.up_down}}% </minus>
+                {% else %}
+                    <plus> +{{stock.up_down}}% </plus>
+                {% endif %}<br>
+                <b> {{ stock.time| date:"Y-m-d H:m" }}</b>
+            </div>
+            {% if user.is_authenticated %}
+                <a class="btn btn-default" href="{% url 'buy_stock' pk=stock.pk %}"><span class="glyphicon glyphicon-plus"></span></a>
+
+            {% endif %}
+                <div class="chart" id= "chart"></div>
+            <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+            <script src="https://code.highcharts.com/stock/highstock.js"></script>
+            <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+            <script src="http://code.highcharts.com/maps/modules/map.js"></script>
+            <script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
+            <script src="https://code.highcharts.com/stock/indicators/regressions.js"></script>
+            <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+            <script>
+                 Highcharts.stockChart('chart', {{ chart_json | safe }})
+            </script>
+ 
+    </div>
+
+        
+
+      
+</div>
+
+
+{% endblock %}

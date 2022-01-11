@@ -1,0 +1,52 @@
+{% load static %}
+
+<html>
+
+<head>
+    <title>주식은 신이다!</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+
+    
+</head>
+
+<body>
+    <div class="wrapper">
+
+
+        <div class="page-header">
+            <a href="{% url 'user_rank' %}" class="top-menu">rank <span class="glyphicon glyphicon-stats">  </span></a>
+            {% if user.is_authenticated %}
+            <p class="top-menu"> {{ user.username }} <small>(<a href="{% url 'logout' %}">Log out</a>)</small></p>
+            {% else %}
+            <a href="{% url 'login' %}" class="top-menu">login <span class="glyphicon glyphicon-log-in">  </span></a>
+            {% endif %}
+            <h1><a href="/">Stock</a></h1>
+
+        </div>
+		{% if user.is_authenticated %}
+
+
+		<div class="left-side">
+
+			자금 : {{user.user_profile.money|linebreaksbr}} <br><br>
+			<div class="stock">
+
+
+			{%for my_stock in holding_stocks %} 
+			{{my_stock.name}} : {{my_stock.cnt|linebreaksbr}}주 <br>
+			{% endfor %}
+			</div>
+		</div>
+		{% endif %}
+        {% block content %} {% endblock %}
+
+
+    </div>
+</body>
+
+</html>

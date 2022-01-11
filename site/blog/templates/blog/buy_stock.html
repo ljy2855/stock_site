@@ -1,0 +1,15 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+
+
+<div class="content container">
+<h1>Buy Stock</h1>
+    <form method="POST" class="post-form">{% csrf_token %}
+        <a> {{stock_data.name}} : {{stock_data.price}} 원 </a>
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Buy</button>
+        <a> 판매시 - 입력 </a>
+    </form>
+</div>
+{% endblock %}

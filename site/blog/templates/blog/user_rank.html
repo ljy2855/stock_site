@@ -1,0 +1,23 @@
+{% extends 'blog/base.html' %} 
+
+{% block content %}
+
+<div class="content container">
+    <div class="row">
+        <div class="col-md-8">
+
+            {% for user_t in user_list %}
+            <div class="post">
+
+                <h1>{{ user_t.user.username}}</h1>
+				<div class="date">
+                   총 자산 : {{ user_t.money }}
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
