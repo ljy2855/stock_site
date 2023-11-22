@@ -1,0 +1,28 @@
+{% extends "pages/base.html" %}
+{% block content %}
+<div class="content container">
+    {% if form.errors %}
+    <p style="color:red;">양식에 맞게 작성해주세요.</p>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <script type="text/javascript">
+        alert('잘못된 접근입니다. \n회원가입을 위해서는 로그아웃이 필요합니다.')
+        window.location.href = '/';
+    </script>
+    {% else %}
+
+    <form method="POST" action="{% url 'sign_up' %}" class="sign-up-form" style="max-width: 600px;">
+        {%csrf_token%}
+        <h2 class="sub-title"> 회원가입 </h2>
+        {% for field in form %}
+        <div class="form-group">
+            {{ field.label }}
+            {{field}}
+        </div>
+        {% endfor %}
+        <button type="submit" class="save btn btn-success">sign_up</button>
+        <a class="btn btn-default" href="{% url 'main_page'  %}"> 돌아가기</span></a>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

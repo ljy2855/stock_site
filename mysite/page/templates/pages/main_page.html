@@ -1,0 +1,27 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+
+
+<div class="content container">
+    <div class="row">
+
+
+        {% for page in pages %}
+        <div class="post">
+            <h2><a href="{% url 'stock_detail' pk=page.pk %}">{{ page.name }}</a></h2>
+            <!-- <div class="date">
+                {{ stock.price}}
+                {% if stock.up_down < 0 %} <minus> {{stock.up_down}}% </minus>
+                    {% else %}
+                    <plus> +{{stock.up_down}}% </plus>
+                {% endif %}
+            </div> -->
+
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}
