@@ -4,7 +4,7 @@
 
 
 .page-header {
-    background-color: rgb(118, 38, 216);
+    background-color: slategray;
     margin-top: 0;
     padding: 20px 20px 20px 40px;
     grid-area: page-header;
@@ -27,6 +27,25 @@
         "page-header page-header"
         "left-side content "
 
+}
+.sidebar {
+    width: 250px;
+    /* position: fixed; */
+    left: 0;
+    top: 0;
+    height: 70%;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    margin: 20px;
+    padding: 20px;
+    padding-left: 40px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    
+}
+
+.page-content {
+    margin-left: 10px;
+    /* 사이드바 너비와 동일하게 설정 */
 }
 
 .left-side {
@@ -92,6 +111,7 @@ h4 {
 
 .date plus {
     color: #ff6969;
+    
 }
 
 .date minus {
@@ -100,4 +120,12 @@ h4 {
 }
 .sign-in-form{
     max-width: 800px;
+}
+.price{
+    padding-right: 5px;
+}
+
+.rank{
+    width: 50%;
+    margin-left: 20px;
 }

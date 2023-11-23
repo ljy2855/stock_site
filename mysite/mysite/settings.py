@@ -12,16 +12,21 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.pymongo import PyMongoIntegration
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-l(*jcwwx8ew29z23!igc8e1l+7-8wl5h0l%#sootx$i9r%5aq)'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    'rest_framework',
+    'user',
     'api',
     'page',
 ]
@@ -51,6 +59,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+sentry_sdk.init(
+    dsn=os.environ.get("DSN"),
+    integrations=[DjangoIntegration(),PyMongoIntegration()],
+    # 성능 모니터링을 위해 traces_sample_rate를 설정 (예: 1.0은 모든 요청을 추적)
+    traces_sample_rate=1.0,
+    enable_tracing=True,
+)
+
+
 
 ROOT_URLCONF = 'mysite.urls'
 
@@ -65,6 +82,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'page.context_processors.holding_stocks',
+                'page.context_processors.user_info'
             ],
         },
     },

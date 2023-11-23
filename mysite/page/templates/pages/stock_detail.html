@@ -1,5 +1,6 @@
-{% extends 'pages/base.html' %}
 
+{% extends 'pages/base.html' %}
+{% load humanize %}
 {% block content %}
 
 
@@ -14,23 +15,23 @@
         <h1>{{ stock.name |linebreaksbr }}</h1>
       
         <h3>
-            현재가 : {{ stock.price|linebreaksbr }}
+            현재가 : {{ stock.current_price|intcomma}}
         </h3>
 
         <div class="date">
-            <plus>고가 : {{ stock.high_price|linebreaksbr }}<br></plus>
-            <minus>저가 : {{ stock.low_price|linebreaksbr }}<br></minus>
+            <plus>고가 : {{ stock.high_price|linebreaksbr |intcomma }}<br></plus>
+            <minus>저가 : {{ stock.low_price|linebreaksbr |intcomma }}<br></minus>
             등락 :
-            {% if stock.up_down < 0 %} <minus> {{stock.up_down}}% </minus>
+            {% if stock.up_down < 0 %} <minus> {{stock.up_down|floatformat:2}}% </minus>
                 {% else %}
-                <plus> +{{stock.up_down}}% </plus>
+                <plus> +{{stock.up_down|floatformat:2}}% </plus>
                 {% endif %}<br>
-                <b> {{ stock.update_at| date:"Y-m-d H:m" }}</b>
+                <b> {{ stock.updated_at| naturaltime }}</b>
         </div>
         {% if user.is_authenticated %}
-        <a class="btn btn-default" href="{% url 'main_page'%}"><span
-                class="glyphicon glyphicon-plus"></span></a>
-
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#purchaseModal">
+            주식 거래
+        </button>
         {% endif %}
         <div id="chartContainer" style="height: 400px; width: 100%;"></div>
 
@@ -40,89 +41,66 @@
 
 
 </div>
+<!-- Modal -->
+<div class="modal fade" id="purchaseModal" tabindex="-1" role="dialog" aria-labelledby="purchaseModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="purchaseModalLabel">주식 구매</h4>
+            </div>
+            <div class="modal-body">
+                <p>거래할 주식의 수량을 정확히 입력해 주시기 바랍니다. (판매 시 음수 입력)</p>
+                <!-- 주식 구매 폼 -->
+                <form id="purchaseForm">
+                    <div class="form-group">
+                        <label for="stockQuantity">수량</label>
+                        <input type="number" class="form-control" id="stockQuantity" required>
+                    </div>
+                    <!-- 추가 폼 필드 -->
+                   
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                <button type="submit" form="purchaseForm" class="btn btn-primary">거래</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-    var ctx = document.getElementById('stockChart').getContext('2d');
-    var jsonData = JSON.parse('{{ data|safe }}'); // Django에서 전달된 데이터
-    var dates = jsonData.map(data => data.date);
-    var closingPrices = jsonData.map(data => data.closing_price);
-    var marketPrices = jsonData.map(data => data.market_price);
-    var highPrices = jsonData.map(data => data.high_price);
-    var lowPrices = jsonData.map(data => data.low_price);
-    var amounts = jsonData.map(data => data.amount);
-    var transformedData = jsonData.map(item => {
-            return {
-                t: luxon.DateTime.fromISO(item.date),
-                o: parseFloat(item.market_price),
-                h: parseFloat(item.high_price),
-                l: parseFloat(item.low_price),
-                c: parseFloat(item.closing_price)
-            };
-        });
-    console.log(transformedData)
-    
-    var stockChart = new Chart(ctx, {
-            type: 'line', // 라인 차트
-            data: {
-                labels: dates,
-                datasets: [
-                    {
-                        label: 'Closing Price',
-                        data: closingPrices,
-                        borderColor: 'red',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Market Price',
-                        data: marketPrices,
-                        borderColor: 'blue',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'High Price',
-                        data: highPrices,
-                        borderColor: 'green',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Low Price',
-                        data: lowPrices,
-                        borderColor: 'purple',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Amount',
-                        data: amounts,
-                        type: 'bar',
-                        borderColor: 'orange',
-                        yAxisID: 'y-axis-2'
-                    }
-                ]
-            },
-            options: {
-            scales: {
-                yAxes: [{
-                    id: 'y-axis-1',
-                    type: 'linear',
-                    position: 'left',
-                    ticks: {
-                        max: 200000, // 예시: 이 값을 조정하여 스케일 조정
-                        min: 0
-                    }
-                }, {
-                    id: 'y-axis-2',
-                    type: 'linear',
-                    position: 'right',
-                    gridLines: {
-                        drawOnChartArea: false
-                    },
-                }],
-                
-            }
-        }
-        });
-</script>
+    $(document).ready(function () {
+        $("#purchaseForm").on('submit', function (e) {
+            e.preventDefault();
 
+            // AJAX를 사용하여 서버에 구매 요청을 보낼 수 있습니다.
+            var quantity = $("#stockQuantity").val();
+            if (quantity == 0) {
+                alert("수량은 0을 제외하고 입력해주세요.");
+                return false; // 폼 제출을 중단
+            }
+            $.ajax({
+                url: "{% url 'trade_stock' %}", // 구매 처리 URL
+                method: "POST",
+                data: {
+                    'quantity': quantity,
+                    'stock_code': "{{ stock.code }}",
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    alert('거래 성공')
+                    window.location.reload();
+                },
+                error: function (error) {
+                    alert('거래 실패')
+                }
+            });
+        });
+    });
+</script>
 <script type="text/javascript">
     
     window.onload = function () {
@@ -214,13 +192,13 @@
         });
          function load() {
             var data = jsonData;
-            console.log(data);
+
             for (var i = 0; i < data.length; i++) {
                 dataPoints1.push({ x: new Date(data[i].date), y: [Number(data[i].market_price), Number(data[i].high_price), Number(data[i].low_price), Number(data[i].closing_price)], color: data[i].market_price < data[i].closing_price ? "green" : "red" });;
                 dataPoints2.push({ x: new Date(data[i].date), y: Number(data[i].amount), color: data[i].market_price < data[i].closing_price ? "green" : "red" });
                 dataPoints3.push({ x: new Date(data[i].date), y: Number(data[i].closing_price) });
             }
-            console.log(dataPoints1);
+   
             stockChart.render();
         }
         load();

@@ -1,5 +1,10 @@
 {% extends "pages/base.html" %}
 {% block content %}
+{% if error %}
+<script>
+    alert("{{ error }}");
+</script>
+{% endif %}
 <div class="content container">
     {% if form.errors %}
     <p style="color:red;">양식에 맞게 작성해주세요.</p>

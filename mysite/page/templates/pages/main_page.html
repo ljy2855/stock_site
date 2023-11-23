@@ -1,5 +1,5 @@
 {% extends 'pages/base.html' %}
-
+{% load humanize %}
 {% block content %}
 
 
@@ -10,13 +10,13 @@
         {% for page in pages %}
         <div class="post">
             <h2><a href="{% url 'stock_detail' pk=page.pk %}">{{ page.name }}</a></h2>
-            <!-- <div class="date">
-                {{ stock.price}}
-                {% if stock.up_down < 0 %} <minus> {{stock.up_down}}% </minus>
+            <div class="date">
+                <row class="price">{{ page.current_price |intcomma }}</row>
+                {% if page.up_down < 0 %} <minus> {{page.up_down|floatformat:2}}% </minus>
                     {% else %}
-                    <plus> +{{stock.up_down}}% </plus>
+                    <plus> +{{page.up_down|floatformat:2}}% </plus>
                 {% endif %}
-            </div> -->
+            </div>
 
         </div>
         {% endfor %}
