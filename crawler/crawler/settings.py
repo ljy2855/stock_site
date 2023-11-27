@@ -63,8 +63,11 @@ DOWNLOAD_DELAY = 0.5
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   "crawler.pipelines.CrawlerPipeline": 300,
+    "crawler.pipelines.KafkaPipeline": 199,
+   "crawler.pipelines.PreProcessPipeline": 200,
+   
    "crawler.pipelines.MongoPipeline": 300,
+   
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -12,6 +12,9 @@ class Stock(models.Model):
     up_down = models.FloatField(default=0)
     volume = models.IntegerField(default=0)
     updated_at = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return self.name
     
 
 

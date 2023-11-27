@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse , JsonResponse
 from django.shortcuts import render
 from user.models import *
 from page.models import *
@@ -6,6 +6,30 @@ from page.models import *
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication,SessionAuthentication
 from rest_framework.decorators import api_view
+from kafka import KafkaConsumer
+from page.crawl_api import *
+import json
+import requests
+
+
+@api_view(['GET'])
+def update_stock_price(request, pk):
+    stock = Stock.objects.get(pk=pk)
+    response = update_current_stock_state(stock.code,False)
+    if response.status_code == 200:
+        consumer = KafkaConsumer(
+        "state_" + stock.code,
+        bootstrap_servers='localhost:9092',
+        value_deserializer=lambda m: json.loads(m.decode('utf-8'))
+        )
+        for message in consumer:
+            # 새로운 메시지 처리
+            consumer.close()
+            return JsonResponse({'status': 'crawling_finish', 'data' : message.value}, status=200)
+    else:
+        return HttpResponse({'status': 'crawling_fail'}, status=503)
+
+
 
 @api_view(['POST'])
 @authentication_classes([BasicAuthentication, TokenAuthentication,SessionAuthentication])

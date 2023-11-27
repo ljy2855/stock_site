@@ -23,9 +23,12 @@ def main_page(request):
 
 
 def stock_detail(request,pk):
+    
     stock = get_object_or_404(Stock,pk = pk)
+    check_stock_history_to_update(stock.code)
     data = get_stock_history(stock.code)
     set_stock_state(stock)
+    
     # print(data)
     return render(request,'pages/stock_detail.html',{'stock': stock,'data' : data})
 

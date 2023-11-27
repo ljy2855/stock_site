@@ -14,8 +14,8 @@
 
         <h1>{{ stock.name |linebreaksbr }}</h1>
       
-        <h3>
-            현재가 : {{ stock.current_price|intcomma}}
+        <h3 >
+            현재가 : <div id="price" data-update-url="{% url 'update_price' pk=stock.pk %}">{{ stock.current_price|intcomma}}</div>
         </h3>
 
         <div class="date">
@@ -204,5 +204,25 @@
         load();
     
     }
+    
+    function checkCrawlingResult() {
+        var updateUrl = document.getElementById('price').getAttribute('data-update-url');
+        $.ajax({
+            url: updateUrl,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                document.getElementById("price").textContent = data.data.data.current_price;
+            },
+            error: function (error) {
+                console.error("오류 발생", error);
+            }
+        });
+        setInterval(checkCrawlingResult, 100000); 
+        }
+
+    checkCrawlingResult() // 예: 5초마다 확인
 </script>
+
 {% endblock %}

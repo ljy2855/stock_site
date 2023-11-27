@@ -7,10 +7,16 @@ from scrapy.http import Request
 class DayStockSpider(scrapy.Spider):
     name = 'day_stock_spider'
     base_url = 'https://finance.naver.com/item/sise_day.naver'
-    start_urls = ['https://finance.naver.com/item/sise_day.naver?code=000660&page=1']
+    
+    # start_urls = ['https://finance.naver.com/item/sise_day.naver?code=000660&page=1']
 
-    def __init__(self, **kwargs: Any):
-        self.code = '000660'
+    def __init__(self, code=None, cnt=40, target_date=None, *args, **kwargs):
+        super(DayStockSpider, self).__init__(*args, **kwargs)
+        assert(code != None)
+        self.code = code
+        self.cnt = cnt
+        self.target_date = target_date
+        self.collection_name = 'stock_' + self.code
         self.field = {'date','closing_price','market_price','high_price','low_price','amount'}
 
     def start_requests(self) -> Iterable[Request]:
@@ -22,9 +28,7 @@ class DayStockSpider(scrapy.Spider):
         yield scrapy.Request(url)
 
     def parse(self, response):
-        # 각 와인의 컨테이너를 반복
-        # print(response.body)
-        # print(response.css('table.type2 tr'))
+       
         self.page +=1
 
         for row in response.css('table.type2 tr'):
@@ -32,6 +36,8 @@ class DayStockSpider(scrapy.Spider):
 
             if date == None:
                 continue
+            if date == self.target_date:
+                return
             yield{
                 'date' : date,
                 'closing_price' : row.css('td:nth-child(2) span::text').get(),
@@ -40,15 +46,10 @@ class DayStockSpider(scrapy.Spider):
                 'low_price' : row.css('td:nth-child(6) span::text').get(),
                 'amount' : row.css('td:nth-child(7) span::text').get(),
             }
-            next_page = response.css("td.pgR a::attr(href)").get()
-            if next_page and self.page < 20:
-                next_url = response.urljoin(next_page)
-                yield scrapy.Request(next_url)
+            
+        if self.page < self.cnt:
+            next_url = self.base_url + '?code={}&page={}'.format(self.code,self.page)
+            yield scrapy.Request(next_url)
             
  
-   
 
-        # 다음 페이지로 이동하는 로직 (필요한 경우)
-        # next_page = response.css('a.next_page::attr(href)').get()
-        # if next_page is not None:
-        #     yield response.follow(next_page, self.parse)
