@@ -11,6 +11,7 @@ import logging
 from itemadapter import ItemAdapter
 import pymongo
 import datetime
+import pytz
 from scrapy import signals
 from kafka import KafkaProducer
 
@@ -40,7 +41,7 @@ class PreProcessPipeline:
             fields = spider.field
             for field in fields:
                 item[field] = int(item[field].replace(',',''))
-            item['time'] = datetime.datetime.now()
+            item['time'] = datetime.datetime.now(tz=pytz.utc)
             item['up_down'] = (item['current_price'] - item['prev_price']) /item['prev_price'] *100
 
         return item
@@ -105,7 +106,7 @@ class KafkaPipeline(object):
     def process_item(self, item, spider):
         if spider.name == "stock_state_spider":
             producer = KafkaProducer(
-            bootstrap_servers='localhost:9092',
+            bootstrap_servers='kafka:9092',
             value_serializer=lambda v: json.dumps(v).encode('utf-8')
             )
             message = {'task': 'start_crawling', 'data': item}

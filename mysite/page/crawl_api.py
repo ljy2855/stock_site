@@ -1,13 +1,13 @@
 from datetime import datetime, time, timedelta
 import json
 
-from kafka import KafkaConsumer
 from .models import *
 from bson import ObjectId
 import pymongo
 from django.conf import settings
 import sentry_sdk
 import requests
+import pytz
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -42,7 +42,7 @@ def update_current_stock_state(code,force_update: False):
 
     # 현재 시간이 크롤링을 허용하는 시간 범위 내에 있는지 확인
     if start_time <= current_time <= end_time or force_update:
-        URL = 'http://localhost:6800/schedule.json'
+        URL = settings.SCRAPYD_URI 
         payload = {
             'project' : "default",
             'spider' : 'stock_state_spider',
@@ -66,7 +66,7 @@ def check_stock_history_to_update(code):
             # 현재 날짜가 평일인지 확인 (0:월요일, 6:일요일)
             is_weekday = current_date.weekday() < 5
             if last_crawled_date.date() <= yesterday_date and is_weekday:
-                URL = 'http://localhost:6800/schedule.json'
+                URL = settings.SCRAPYD_URI
                 payload = {
                     'project' : "default",
                     'spider' : 'day_stock_spider',
@@ -75,7 +75,7 @@ def check_stock_history_to_update(code):
                 }
                 requests.post(URL,data=payload)
         else:
-            URL = 'http://localhost:6800/schedule.json'
+            URL = settings.SCRAPYD_URI
             payload = {
                 'project' : "default",
                 'spider' : 'day_stock_spider',

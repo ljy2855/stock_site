@@ -26,7 +26,6 @@
                 {% else %}
                 <plus> +{{stock.up_down|floatformat:2}}% </plus>
                 {% endif %}<br>
-                <b> {{ stock.updated_at| naturaltime }}</b>
         </div>
         {% if user.is_authenticated %}
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#purchaseModal">
@@ -214,12 +213,13 @@
             success: function (data) {
                 console.log(data);
                 document.getElementById("price").textContent = data.data.data.current_price;
+                setInterval(checkCrawlingResult, 100000); 
             },
             error: function (error) {
                 console.error("오류 발생", error);
             }
         });
-        setInterval(checkCrawlingResult, 100000); 
+        
         }
 
     checkCrawlingResult() // 예: 5초마다 확인

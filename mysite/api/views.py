@@ -1,4 +1,5 @@
 from django.http import HttpResponse , JsonResponse
+from django.conf import settings
 from django.shortcuts import render
 from user.models import *
 from page.models import *
@@ -19,7 +20,7 @@ def update_stock_price(request, pk):
     if response.status_code == 200:
         consumer = KafkaConsumer(
         "state_" + stock.code,
-        bootstrap_servers='localhost:9092',
+        bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
         value_deserializer=lambda m: json.loads(m.decode('utf-8'))
         )
         for message in consumer:

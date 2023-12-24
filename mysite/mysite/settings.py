@@ -31,7 +31,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('HOSTS').split()
 
 
 # Application definition
@@ -105,6 +105,12 @@ DATABASES = {
     }
 }
 
+MONGO_URI=os.environ.get("MONGO_URI")
+MONGO_DATABASE = os.environ.get("MONGO_DATABASE")
+
+KAFKA_BOOTSTRAP_SERVERS=os.environ.get("KAFKA_BOOTSTRAP_SERVERS")
+
+SCRAPYD_URI=os.environ.get("SCRAPYD_URI")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -132,9 +138,9 @@ LANGUAGE_CODE = 'ko'
 
 TIME_ZONE = 'Asia/Seoul'
 
-USE_I18N = True
+# USE_I18N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -143,6 +149,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
@@ -153,5 +162,4 @@ LOGIN_REDIRECT_URL = '/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-MONGO_URI = 'mongodb://localhost:27017'
-MONGO_DATABASE = 'mystock'
+
