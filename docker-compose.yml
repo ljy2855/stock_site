@@ -5,16 +5,16 @@ services:
     image: nginx:latest
     volumes:
       - ./nginx:/etc/nginx/conf.d
-      - ./mysite/static:/static
+      - static_volunme:/home/app/web/static
     ports:
-      - "80:80"
+      - "9003:80"
     depends_on:
       - django
 
   django:
     build: ./mysite
     volumes:
-      - ./mysite:/usr/src/app
+      - static_volunme:/usr/src/app/static
     expose:
       - "8000"
     depends_on:
@@ -59,3 +59,4 @@ services:
 
 volumes:
   mongo_data:
+  static_volunme:

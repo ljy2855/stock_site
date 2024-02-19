@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'corsheaders',
     'rest_framework',
     'user',
     'api',
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -141,6 +143,12 @@ TIME_ZONE = 'Asia/Seoul'
 # USE_I18N = True
 
 # USE_TZ = True
+CSRF_TRUSTED_ORIGINS = [
+    'https://stock.cspc.me',
+]
+CORS_ALLOWED_ORIGINS = [
+    'https://stock.cspc.me',
+]
 
 
 # Static files (CSS, JavaScript, Images)
@@ -149,9 +157,6 @@ TIME_ZONE = 'Asia/Seoul'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
 
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'

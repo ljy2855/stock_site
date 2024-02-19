@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Scrapyd 서비스 실행
-CMD ["scrapyd"]
+CMD ["scrapyd","--pidfile=/usr/src/app/scrapyd.pid"]
